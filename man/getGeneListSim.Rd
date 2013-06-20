@@ -5,7 +5,9 @@
   Given a list of genes, the function calculates the pairwise similarities for any two genes in the list using different strategies.
 }
 \usage{
-  getGeneListSim(genelist,combinemethod="funSimMax",method="Resnik",ontology="PA",normalization=FALSE,normalizationmethod="Lin",verbose=FALSE)
+  getGeneListSim(genelist,combinemethod="funSimMax",method="Resnik",
+                 ontology="PA",normalization=FALSE,normalizationmethod="Lin",
+                 verbose=FALSE)
 }
 \arguments{
   \item{genelist}{ character vector of Entrez gene IDs }
@@ -19,10 +21,10 @@
 \details{
   The method to calculate the pairwise disease similarity between gene products can either be: 
   \describe{
-    \item{"max"}{the maximum similarity between any two DO terms}
-    \item{"mean"}{the average similarity between any two DO terms1[1]}
-    \item{funSimMax}{ the average of best matching DO term similarities. Take the maximum of the scores achieved by assignments of DO terms from gene 1 to gene 2 and vice versa. [2]}
-    \item{funSimAvg}{ the average of best matching DO term similarities. Take the average of the scores achieved by assignments of DO terms from gene 1 to gene 2 and vice versa. [2]}
+    \item{"max"}{the maximum similarity between any two HPO terms}
+    \item{"mean"}{the average similarity between any two HPO terms1[1]}
+    \item{funSimMax}{ the average of best matching HPO term similarities. Take the maximum of the scores achieved by assignments of HPO terms from gene 1 to gene 2 and vice versa. [2]}
+    \item{funSimAvg}{ the average of best matching HPO term similarities. Take the average of the scores achieved by assignments of HPO terms from gene 1 to gene 2 and vice versa. [2]}
     \item{"BMA"}{best match average approach [3]} 
   }
 }
@@ -32,11 +34,8 @@
 \author{
   Yue Deng<anfdeng@163.com>
 }
-\seealso{  
-  \code{\link{getTermListSim}}
-}
 \examples{
-  getGeneListSim(c("2","9","25"),combinemethod="mean")
+  getGeneListSim(c("410","650","367"))
 }
 \keyword{ manip }
 

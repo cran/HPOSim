@@ -10,13 +10,13 @@
   \tabular{ll}{
     Package: \tab HPOSim\cr
     Type: \tab Package\cr
-    Version: \tab 1.0\cr
-    Date: \tab 2013-03-25\cr
+    Version: \tab 1.1\cr
+    Date: \tab 2013-05-25\cr
     License: \tab GPL-2\cr
   }
 }
 \author{
-  Yue Deng, Gang Wang, Xiaocheng Huang and Tingting Ma
+  Yue Deng, Gang Wang, Xiaocheng Huang, Qinhao Wu and Tingting Ma
   Maintainer: Yue Deng <anfdeng@163.com>
 }
 \keyword{ package }

@@ -1,4 +1,10 @@
 # Export all names
 exportPattern(".")
 # Import all packages listed as Imports or Depends
-import(AnnotationDbi,HPO.db,igraph,utils)
+#import(utils,AnnotationDbi)
+importFrom(igraph,graph.data.frame)
+importFrom(HPO.db,HPOANCESTOR)
+importFrom(HPO.db,HPOCHILDREN)
+importFrom(HPO.db,HPOOFFSPRING)
+importFrom(HPO.db,HPOPARENTS)
+importFrom(HPO.db,HPOTERM)

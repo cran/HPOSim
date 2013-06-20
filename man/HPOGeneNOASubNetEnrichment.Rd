@@ -36,14 +36,17 @@
 \examples{
   edges <- data.frame(node1=c("65018","65019","65055","65055","65125","65266"),
                       node2=c("65055","65055","65125","65266","65266","79001"))
-  graph<-graph.data.frame(edges,directed=FALSE)
+  graph<-igraph::graph.data.frame(edges,directed=FALSE)
   write.csv(edges,file="HPOGeneNOASubNetEnrichment-testnetwork.csv",row.names=FALSE) 
  
-  edges <- data.frame(node1=c("65018","65018","65018","65018","65018","65055","65055","65055","65055","65109","65109","65109","65125","65125","65266"),
-                      node2=c("65055","65109","65125","65266","79001","65019","65125","65266","79001","65125","65266","79001","65266","79001","79001"))
-  graph<-graph.data.frame(edges,directed=FALSE)
+  edges <- data.frame(node1=c("65018","65018","65018","65018","65018","65055","65055",
+                              "65055","65055","65109","65109","65109","65125","65125","65266"),
+                      node2=c("65055","65109","65125","65266","79001","65019","65125",
+                              "65266","79001","65125","65266","79001","65266","79001","79001"))
+  graph<-igraph::graph.data.frame(edges,directed=FALSE)
   write.csv(edges,file="HPOGeneNOASubNetEnrichment-backgroundnetwork.csv",row.names=FALSE) 
 
-  HPOGeneNOASubNetEnrichment("HPOGeneNOASubNetEnrichment-testnetwork.csv","HPOGeneNOASubNetEnrichment-backgroundnetwork.csv",cutoff=0.1)
+  HPOGeneNOASubNetEnrichment("HPOGeneNOASubNetEnrichment-testnetwork.csv",
+                             "HPOGeneNOASubNetEnrichment-backgroundnetwork.csv",cutoff=0.1)
 }
 \keyword{ manip }

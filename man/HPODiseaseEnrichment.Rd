@@ -5,7 +5,8 @@
 	Given a list of disease, the function returns the enriched HPO terms.
 }
 \usage{
-	HPODiseaseEnrichment(diseaselist,filter=5,cutoff=0.05,background=getDiseaseDefaultBackground())
+	HPODiseaseEnrichment(diseaselist,filter=5,cutoff=0.05,
+                            background=getDiseaseDefaultBackground())
 }
 
 \arguments{

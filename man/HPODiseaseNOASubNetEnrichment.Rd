@@ -34,16 +34,25 @@
   \code{\link{HPODiseaseNOAWholeNetEnrichment}}
 }
 \examples{
-  edges <- data.frame(node1=c("OMIM:275350","OMIM:212750","OMIM:212750","OMIM:275350","OMIM:212750","OMIM:260400"),
-                      node2=c("OMIM:100050","OMIM:105600","OMIM:249270","OMIM:300751","OMIM:250250","OMIM:105600"))
-  graph<-graph.data.frame(edges,directed=FALSE)
+  edges <- data.frame(node1=c("OMIM:275350","OMIM:212750","OMIM:212750",
+                             "OMIM:275350","OMIM:212750","OMIM:260400"),
+                      node2=c("OMIM:100050","OMIM:105600","OMIM:249270",
+                              "OMIM:300751","OMIM:250250","OMIM:105600"))
+  graph<-igraph::graph.data.frame(edges,directed=FALSE)
   write.csv(edges,file="HPODiseaseNOASubNetEnrichment-testnetwork.csv",row.names=FALSE) 
  
-  edges <- data.frame(node1=c("OMIM:275350","OMIM:212750","OMIM:212750","OMIM:275350","OMIM:212750","OMIM:300835","OMIM:260400", "OMIM:275350","OMIM:260400","OMIM:300835","OMIM:106230","OMIM:106240","OMIM:106250","OMIM:106260"),
-                      node2=c("OMIM:100050","OMIM:105600","OMIM:249270","OMIM:300751","OMIM:250250","OMIM:300751","OMIM:250250", "OMIM:250250","OMIM:105600","OMIM:105600","OMIM:106260","OMIM:106230","OMIM:106240","OMIM:106250"))
-  graph<-graph.data.frame(edges,directed=FALSE)
+  edges <- data.frame(node1=c("OMIM:275350","OMIM:212750","OMIM:212750","OMIM:275350",
+                              "OMIM:212750","OMIM:300835","OMIM:260400","OMIM:275350",
+                              "OMIM:260400","OMIM:300835","OMIM:106230","OMIM:106240",
+                              "OMIM:106250","OMIM:106260"),
+                      node2=c("OMIM:100050","OMIM:105600","OMIM:249270","OMIM:300751",
+                              "OMIM:250250","OMIM:300751","OMIM:250250","OMIM:250250",
+                              "OMIM:105600","OMIM:105600","OMIM:106260","OMIM:106230",
+                              "OMIM:106240","OMIM:106250"))
+  graph<-igraph::graph.data.frame(edges,directed=FALSE)
   write.csv(edges,file="HPODiseaseNOASubNetEnrichment-backgroundnetwork.csv",row.names=FALSE) 
 
-  HPODiseaseNOASubNetEnrichment("HPODiseaseNOASubNetEnrichment-testnetwork.csv","HPODiseaseNOASubNetEnrichment-backgroundnetwork.csv",cutoff=0.1)
+  HPODiseaseNOASubNetEnrichment("HPODiseaseNOASubNetEnrichment-testnetwork.csv",
+                                "HPODiseaseNOASubNetEnrichment-backgroundnetwork.csv",cutoff=0.1)
 }
 \keyword{ manip }

@@ -33,9 +33,13 @@
   \code{\link{HPODiseaseEnrichment}}
 }
 \examples{
-  edges <- data.frame(node1=c("OMIM:275350","OMIM:212750","OMIM:212750","OMIM:275350","OMIM:212750","OMIM:300835","OMIM:260400","OMIM:275350"),
-                      node2=c("OMIM:100050","OMIM:105600","OMIM:249270","OMIM:300751","OMIM:250250","OMIM:300751","OMIM:250250","OMIM:250250"))
-  graph<-graph.data.frame(edges,directed=FALSE)
+  edges <- data.frame(node1=c("OMIM:275350","OMIM:212750","OMIM:212750",
+                              "OMIM:275350","OMIM:212750","OMIM:300835",
+                              "OMIM:260400","OMIM:275350"),
+                      node2=c("OMIM:100050","OMIM:105600","OMIM:249270",
+                              "OMIM:300751","OMIM:250250","OMIM:300751",
+                              "OMIM:250250","OMIM:250250"))
+  graph<-igraph::graph.data.frame(edges,directed=FALSE)
   write.csv(edges,file="HPODiseaseNOAWholeNetEnrichment-testwork.csv",row.names=FALSE) 
   HPODiseaseNOAWholeNetEnrichment("HPODiseaseNOAWholeNetEnrichment-testwork.csv",cutoff=0.8)
 }

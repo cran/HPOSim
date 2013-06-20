@@ -1,25 +1,25 @@
 getGeneDefaultBackground<-function(){
-  initialize()  
+  .initialize()  
   gene2hpo<-get("gene2hpo",envir=HPOSimEnv) 
   return(names(gene2hpo)) 
 }
 getDiseaseDefaultBackground<-function(){
-  initialize()  
+  .initialize()  
   disease2hpo<-get("disease2hpo",envir=HPOSimEnv) 
   return(names(disease2hpo)) 
 }
 
 HPOGeneEnrichment <-
   function(genelist,filter=5,cutoff=0.05,background=getGeneDefaultBackground()){
-    initialize()  
+    .initialize()  
     if(is.list(genelist)){
       genelist<-unique(unlist(genelist));
     }else{
       genelist<-unique(genelist); 
-    }	
+    }  
     
     genelist<-as.character(genelist)
-
+    
     #get gene annotated HPOterms
     gene2hpo<-get("gene2hpo",envir=HPOSimEnv)
     annotatedhpoids<-gene2hpo[genelist[genelist %in% names(gene2hpo)]] 
@@ -29,7 +29,7 @@ HPOGeneEnrichment <-
     }
     
     hpo2gene<-get("hpo2gene",envir=HPOSimEnv) 
-
+    
     #filter out hpoid which have at least 5 geneids annotated to this term
     filteredhpoids<-sapply(annotatedhpoids,function(x){length(hpo2gene[[x]])>=filter})
     filteredhpoids<-annotatedhpoids[filteredhpoids] 
@@ -85,19 +85,20 @@ HPODiseaseEnrichment <-
     
     diseaselist<-as.character(diseaselist)
     ######################################
-    initialize()
+    .initialize()
     disease2hpo<-get("disease2hpo",envir=HPOSimEnv)
     annotatedhpoids<-disease2hpo[diseaselist[diseaselist %in% names(disease2hpo)]] 
-    annotatedhpoids<-unique(unlist(annotatedhpoids)) 
+    annotatedhpoids<-c(unique(unlist(getTermAncestors(annotatedhpoids))),annotatedhpoids)
+    annotatedhpoids<-unique(na.omit(unlist(annotatedhpoids)))
     if(length(annotatedhpoids) == 0){ 
       stop(paste("No HPOIDS are annotated by",length(diseaselist),"disease list"))
     }
     hpo2disease<-get("hpo2disease",envir=HPOSimEnv)
-
+    
     ######################################
     #filter out hpoid which have at least 5 diseaseids annotated to this term
     
-    filteredhpoids<-sapply(annotatedhpoids,function(x){length(hpo2disease[[x]])>=filter}) 
+    filteredhpoids<-sapply(annotatedhpoids,function(x){length(c(hpo2disease[x],getTermOffspringDiseases(x)))>=filter}) 
     filteredhpoids<-annotatedhpoids[filteredhpoids] 
     
     if(length(filteredhpoids)==0){ 
@@ -110,8 +111,8 @@ HPODiseaseEnrichment <-
     res<-list()
     searchdiseasenum<-length(diseaselist) 
     for(i in 1:length(filteredhpoids)){
-      n<-length(hpo2disease[[filteredhpoids[i]]]) 
-      m<-length(diseaselist[diseaselist %in% hpo2disease[[filteredhpoids[i]]]]) 
+      n<-length(c(hpo2disease[[filteredhpoids[i]]],getTermOffspringDiseases(filteredhpoids[i]))) 
+      m<-length(diseaselist[diseaselist %in% c(hpo2disease[[filteredhpoids[i]]],getTermOffspringDiseases(filteredhpoids[i]))]) 
       #p=phyper(m,n,humandiseasenum-n,searchdiseasenum,lower.tail=FALSE)
       p=1-phyper(m-1,n,humandiseasenum-n,searchdiseasenum) 
       res[[filteredhpoids[i]]]<-list('hpoid'=filteredhpoids[i],'pvalue'=p,'odds'=(m/searchdiseasenum)/(n/humandiseasenum),'annDiseaseNumber'=m,'annBgNumber'=searchdiseasenum,'diseaseNumber'=n,'bgNumber'=humandiseasenum) #对每个HPOID构建一个列表，后面用sapply循环构建数据框
@@ -125,7 +126,7 @@ HPODiseaseEnrichment <-
     }
     
     qvalueList=p.adjust(res$pvalue,method="fdr") 
-
+    
     res<-data.frame(res,"qvalue"=qvalueList) 
     sort.data.frame <- function(x, key, ...) { 
       if (missing(key)) {
@@ -144,7 +145,7 @@ HPODiseaseEnrichment <-
 
 HPOGeneNOAWholeNetEnrichment <-
   function(file,filter=5,cutoff=0.05){
-    initialize()  
+    .initialize()  
     network<-read.csv(file,header=F)
     nodelist<-list() 
     for(i in 2:nrow(network))
@@ -253,7 +254,7 @@ HPOGeneNOAWholeNetEnrichment <-
 
 HPODiseaseNOAWholeNetEnrichment <-
   function(file,filter=5,cutoff=0.05){
-    initialize()  
+    .initialize()  
     network<-read.csv(file,header=F)
     #get all the nodes in the graph
     nodelist<-list() #节点列表
@@ -284,11 +285,11 @@ HPODiseaseNOAWholeNetEnrichment <-
       bound2<-i+1 
       for(j in bound2:length(nodelist))
       {
-        hpo1<-disease2hpo[[nodelist[i]]]
-        #print(paste("disease1:",nodelist[i]," HPO id:",hpo1))
-        hpo2<-disease2hpo[[nodelist[j]]]
-        #print(paste("disease2:",nodelist[j]," HPO id:",hpo2))
-            
+        hpo1<-c(disease2hpo[[nodelist[i]]],unique(unlist(getTermAncestors(disease2hpo[[nodelist[i]]]))))
+        #message(paste("disease1:",nodelist[i]," HPO id:",hpo1))
+        hpo2<-c(disease2hpo[[nodelist[j]]],unique(unlist(getTermAncestors(disease2hpo[[nodelist[j]]]))))
+        #message(paste("disease2:",nodelist[j]," HPO id:",hpo2))
+        
         interset<-hpo1[hpo1 %in% hpo2] 
         if(length(interset)>=1) 
         {
@@ -368,7 +369,7 @@ HPODiseaseNOAWholeNetEnrichment <-
 
 HPOGeneNOASubNetEnrichment <-
   function(testfile,backgroundfile,filter=5,cutoff=0.05){
-    initialize()  
+    .initialize()  
     testnetwork<-read.csv(testfile,header=F) 
     backgroundnetwork<-read.csv(backgroundfile,header=F) #reference set
     #get all the nodes in reference set
@@ -457,7 +458,7 @@ HPOGeneNOASubNetEnrichment <-
     }else{
       res<-data.frame("HPOID"=sapply(res,function(x){x$hpoid}),"annEdgeNumber"=sapply(res,function(x){x$annEdgeNumber}),"annBgNumber"=sapply(res,function(x){x$annBgNumber}),"edgeNumber"=sapply(res,function(x){x$edgeNumber}),"bgNumber"=sapply(res,function(x){x$bgNumber}),"odds"=sapply(res,function(x){x$odds}),"pvalue"=sapply(res,function(x){x$pvalue}))
     }
-   
+    
     qvalueList=p.adjust(res$pvalue,method="fdr") 
     res<-data.frame(res,"qvalue"=qvalueList) 
     sort.data.frame <- function(x, key, ...) { 
@@ -479,7 +480,13 @@ HPOGeneNOASubNetEnrichment <-
 
 HPODiseaseNOASubNetEnrichment <-
   function(testfile,backgroundfile,filter=5,cutoff=0.05){
-    initialize()  
+#     ###
+#     testfile<-"HPODiseaseNOASubNetEnrichment-testnetwork.csv"
+#     backgroundfile<-"HPODiseaseNOASubNetEnrichment-backgroundnetwork.csv"
+#     filter<-5
+#     cutoff<-0.1
+#     ##
+    .initialize()  
     testnetwork<-read.csv(testfile,header=F) 
     backgroundnetwork<-read.csv(backgroundfile,header=F) 
     
@@ -504,12 +511,13 @@ HPODiseaseNOASubNetEnrichment <-
     edgenum<-0 
     annotatedhpoids<-list() 
     hpo2edge<-list() 
+    #i<-2
     for(i in 2:nrow(backgroundnetwork))
     {
       line<-backgroundnetwork[i,]
       line<-line[line!=""] 
-      hpo1<-disease2hpo[[line[1]]]
-      hpo2<-disease2hpo[[line[2]]]
+      hpo1<-c(disease2hpo[[line[1]]],unique(unlist(getTermAncestors(disease2hpo[[line[1]]]))))
+      hpo2<-c(disease2hpo[[line[2]]],unique(unlist(getTermAncestors(disease2hpo[[line[2]]]))))
       interset<-hpo1[hpo1 %in% hpo2] 
       if(length(interset)>=1) 
       {

@@ -1,44 +1,54 @@
-initialize<-function(pos = 1,envir = as.environment(pos)){
+.initialize<-function(pos = 1,envir = as.environment(pos)){
   if(!exists("HPOSimEnv") || length(HPOSimEnv)<1) {
-    print("initializing HPOSim package ...")		
-    #assign("HPOSimEnv",new.env(),envir=.GlobalEnv)  
+    message("initializing HPOSim package ...")		
     assign("HPOSimEnv",new.env(),envir=envir)  
-    #HPOSimEnv<-new.env()
 
-    data("GeneTermIC",envir=HPOSimEnv)	
-    data("DiseaseTermIC",envir=HPOSimEnv)	
+    data("GeneTermIC",envir=HPOSimEnv)
+    data("DiseaseTermIC",package="HPOSim", envir=HPOSimEnv)	
     data("GeneToPhenotype",envir=HPOSimEnv)
     data("PhenotypeToGene",envir=HPOSimEnv)
     data("DiseaseToPhenotype",envir=HPOSimEnv)
     data("PhenotypeToDisease",envir=HPOSimEnv)
-    print("finished.")
+    #tryCatch(utils::data(list=c("GeneTermIC","DiseaseTermIC","GeneToPhenotype","PhenotypeToGene","DiseaseToPhenotype","PhenotypeToDisease"), envir=HPOSimEnv))
+
+    message("done.")
+  }
+}
+
+.initial<-function(pos = 1,envir = as.environment(pos)){
+  if(!exists("HPOSimEnv") || length(HPOSimEnv)<1) {
+    packageStartupMessage("initializing HPOSim package ...")		
+    assign("HPOSimEnv",new.env(),envir=envir)  
+    #tryCatch(utils::data(list=c("GeneTermIC","DiseaseTermIC","GeneToPhenotype","PhenotypeToGene","DiseaseToPhenotype","PhenotypeToDisease"), envir=HPOSimEnv))
+
+    packageStartupMessage("done.")
   }
 }
 
 getOffsprings<-function(){
-  require(HPO.db)
-  initialize()
+  #require(HPO.db)
+  .initialize()
   res<-AnnotationDbi::as.list(HPOOFFSPRING)
   assign("Offsprings",res,envir=HPOSimEnv)
 }
 
 getAncestors<-function(){
-  require(HPO.db)
-  initialize()
+  #require(HPO.db)
+  .initialize()
   res<-AnnotationDbi::as.list(HPOANCESTOR)
   assign("Ancestors",res,envir=HPOSimEnv)
 }
 
 getParents<-function(){
-  require(HPO.db)
-  initialize()
+  #require(HPO.db)
+  .initialize()
   res<-AnnotationDbi::as.list(HPOPARENTS)
   assign("Parents",res,envir=HPOSimEnv)
 }
 
 getChildren<-function(){
-  require(HPO.db)
-  initialize()
+  #require(HPO.db)
+  .initialize()
   res<-AnnotationDbi::as.list(HPOCHILDREN)
   assign("Children",res,envir=HPOSimEnv)
 }
@@ -51,7 +61,7 @@ getTermOffsprings<-
       hpolist<-unique(hpolist)
     }
     if(verbose){
-      print("Start to fetch the offsprings")
+      message("Start to fetch the offsprings")
     }
     if(!exists("HPOSimEnv")||!exists("Offsprings",envir=HPOSimEnv)) getOffsprings()
     offspring<-get("Offsprings",envir=HPOSimEnv)
@@ -73,7 +83,7 @@ getTermParents<-
       hpolist<-unique(hpolist)
     }
     if(verbose){
-      print("Start to fetch the parents")
+      message("Start to fetch the parents")
     }
     if(!exists("HPOSimEnv")||!exists("Parents",envir=HPOSimEnv)) getParents()
     parent<-get("Parents",envir=HPOSimEnv)
@@ -95,7 +105,7 @@ getTermAncestors<-
       hpolist<-unique(hpolist)
     }
     if(verbose){
-      print("Start to fetch the ancestors")
+      message("Start to fetch the ancestors")
     }
     if(!exists("HPOSimEnv")||!exists("Ancestors",envir=HPOSimEnv)) getAncestors()
     ancestor<-get("Ancestors",envir=HPOSimEnv)
@@ -117,7 +127,7 @@ getTermChildren<-
       hpolist<-unique(hpolist)
     }
     if(verbose){
-      print("Start to fetch the children")
+      message("Start to fetch the children")
     }
     if(!exists("HPOSimEnv")||!exists("Children",envir=HPOSimEnv)) getChildren()
     child<-get("Children",envir=HPOSimEnv)
@@ -132,8 +142,8 @@ getTermChildren<-
   }
 
 getTerms<-function(){
-  require(HPO.db)
-  initialize()
+  #require(HPO.db)
+  .initialize()
   res<-AnnotationDbi::as.list(HPOTERM)
   assign("HPOTerms",res,envir=HPOSimEnv)
 }
@@ -155,42 +165,31 @@ getTerm<-
     }
     res
   }
-
-
-calculateICS<-function(){
-  require(HPO.db)
-  initialize()
-  PhenotypeToGenes<-read.csv(file="PhenotypeToGenes.csv",header=FALSE,sep=",")
-  nrows<-length(PhenotypeToGenes[,1])
-  if(!exists("HPOSimEnv")||!exists("HPOTerm",envir=HPOSimEnv)) 
-    getTerms()
+  
+getTermOffspringDiseases<-function(t){
+    hpo2disease<-get("hpo2disease",envir=HPOSimEnv)
+    diseases<-unique(unlist(lapply(getTermOffsprings(t),function(x){hpo2disease[x]})))
+    return(diseases)
+}
+  
+calculateGeneTermIC<-function(){
+  #require(HPO.db)
+  .initialize()
+  getTerms()
   term<-get("HPOTerms",envir=HPOSimEnv)
   termlist<-as.factor(names(term))
-  termfrequency<-data.frame(termlist,0)
+  hpo2gene<-get("hpo2gene",envir=HPOSimEnv)
   
-  ##frequencies of special terms，root nodes of 3 ontologies
-  termfrequency[termfrequency[1]=="HP:0000001",][2]<-1826  ##all
-  termfrequency[termfrequency[1]=="HP:0000004",][2]<-669   ##root nodes of 3 ontologies
-  termfrequency[termfrequency[1]=="HP:0000005",][2]<-1764
-  termfrequency[termfrequency[1]=="HP:0000118",][2]<-1812
-  
-  ##calculate frequencies of all terms
-  i<-1
-  for(i in 5400:nrows)
-  {
-    xx<-PhenotypeToGenes[i,]
-    xx<-xx[!is.na(xx)]
-    ##termfrequency[i,2]<-length(xx)-1
-    termfrequency[termfrequency[1]==xx[1],][2]<-length(xx)-1
-  }
-  
-  OC<-getTermOffsprings("HP:0000004",verbose=FALSE)
-  OC<-OC$HP
-  MI<-getTermOffsprings("HP:0000005",verbose=FALSE)
-  MI<-MI$HP
-  PA<-getTermOffsprings("HP:0000118",verbose=FALSE)
-  PA<-PA$HP
-  
+  OCTerms<-unlist(getTermOffsprings("HP:0000004",verbose=FALSE))
+  OCgenenumber<-length(hpo2gene["HP:0000004"]$HP)
+  MITerms<-unlist(getTermOffsprings("HP:0000005",verbose=FALSE))
+  MIgenenumber<-length(hpo2gene["HP:0000005"]$HP)
+  PATerms<-unlist(getTermOffsprings("HP:0000118",verbose=FALSE))
+  PAgenenumber<-length(hpo2gene["HP:0000118"]$HP)
+
+  termfreq<-lapply(termlist,function(x){length(hpo2gene[as.character(x)]$HP)})
+  termfrequency<-data.frame(termlist,unlist(termfreq))
+
   ##calculate IC
   termIC<-data.frame(termlist,ontology="",0) 
   termIC$ontology<-as.character(termIC$ontology)
@@ -198,22 +197,76 @@ calculateICS<-function(){
   termIC[termIC[1]=="HP:0000004",]$ontology<-"OC"
   termIC[termIC[1]=="HP:0000005",]$ontology<-"MI"
   termIC[termIC[1]=="HP:0000118",]$ontology<-"PA"
-  for(i in 2:length(termlist))
+  termsnumber<-length(termlist)
+  for(i in 2:termsnumber)
   {
+    message(paste(i,"of",termsnumber))
     xx<-as.character(termIC[i,]$termlist)
-    if(xx %in% PA)
-    {termIC[termIC[1]==xx,]$ontology<-"PA"
-     termIC[termIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/1812)
+    if(xx %in% PATerms){
+      termIC[termIC[1]==xx,]$ontology<-"PA"
+      termIC[termIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/PAgenenumber)
     }
-    if(xx %in% OC)
-    {termIC[termIC[1]==xx,]$ontology<-"OC"
-     termIC[termIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/669)
+    if(xx %in% OCTerms){
+      termIC[termIC[1]==xx,]$ontology<-"OC"
+      termIC[termIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/OCgenenumber)
     }
-    if(xx %in% MI)
-    {termIC[termIC[1]==xx,]$ontology<-"MI"
-     termIC[termIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/1764)
-    }	
+    if(xx %in% MITerms){
+      termIC[termIC[1]==xx,]$ontology<-"MI"
+      termIC[termIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/MIgenenumber)
+    }
   }
-  save(termIC,file="termIC.rda")
+  save(termIC,file="GeneTermIC.rda",compress="bzip2")
 }
 
+calculateDiseaseTermIC<-function(){
+  #require(HPO.db)
+  .initialize()
+  getTerms()
+  term<-get("HPOTerms",envir=HPOSimEnv)
+  termlist<-as.factor(names(term))
+  hpo2disease<-get("hpo2disease",envir=HPOSimEnv)
+  
+  OCTerms<-unlist(getTermOffsprings("HP:0000004",verbose=FALSE))
+  OCdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000004"),hpo2disease["HP:0000004"]))
+  MITerms<-unlist(getTermOffsprings("HP:0000005",verbose=FALSE))
+  MIdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000005"),hpo2disease["HP:0000005"]))
+  PATerms<-unlist(getTermOffsprings("HP:0000118",verbose=FALSE))
+  PAdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000118"),hpo2disease["HP:0000118"]))
+  
+  termfreq<-lapply(termlist,function(x){length(unique(c(getTermOffspringDiseases(x),hpo2disease[x])))})
+  termfrequency<-data.frame(termlist,unlist(termfreq))
+  
+  ##calculate Disease Term IC
+  DiseasetermIC<-data.frame(termlist,ontology="",0) 
+  DiseasetermIC$ontology<-as.character(DiseasetermIC$ontology)
+  DiseasetermIC[1,]$ontology="All"
+  DiseasetermIC[DiseasetermIC[1]=="HP:0000004",]$ontology<-"OC"
+  DiseasetermIC[DiseasetermIC[1]=="HP:0000005",]$ontology<-"MI"
+  DiseasetermIC[DiseasetermIC[1]=="HP:0000118",]$ontology<-"PA"
+  termsnumber<-length(termlist)
+  for(i in 2:termsnumber)
+  {
+    message(paste(i,"of",termsnumber))
+    xx<-as.character(DiseasetermIC[i,]$termlist)
+    if(xx %in% PATerms){
+      DiseasetermIC[DiseasetermIC[1]==xx,]$ontology<-"PA"
+      DiseasetermIC[DiseasetermIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/PAdiseasenumber)
+    }
+    if(xx %in% OCTerms){
+      DiseasetermIC[DiseasetermIC[1]==xx,]$ontology<-"OC"
+      DiseasetermIC[DiseasetermIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/OCdiseasenumber)
+    }
+    if(xx %in% MITerms){
+      DiseasetermIC[DiseasetermIC[1]==xx,]$ontology<-"MI"
+      DiseasetermIC[DiseasetermIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/MIdiseasenumber)
+    }
+  }
+  save(DiseasetermIC,file="DiseaseTermIC.rda",compress="bzip2")
+}
+
+RemoveTermsWithoutIC <- function (terms,ontology,IC){
+  info<-IC[IC[,1] %in% terms,] #所有条目对应的IC信息
+  info<-info[info[,2]==ontology,] #筛选本体
+  info<-info[info[,3]!=Inf,] #筛选IC的值
+  return (as.character(info[,1]))
+}

@@ -1,59 +1,61 @@
 calcTermSim <-
-  function(term1, term2, method="Resnik", verbose=FALSE){
-    initialize()
-    IC<-get("termIC", envir=HPOSimEnv)
+  function(term1, term2, method="Resnik", IC, verbose=FALSE){
+    .initialize()
+    #     if(verbose)
+    #       message(paste("calTermSim between:",term1,",",term2,"( method:",method,")"))  
+    #   IC<-get("termIC", envir=HPOSimEnv)
     if(method== "Resnik"){
-      an=getMinimumSubsumer(term1,term2)
-      if(an == "NA")
+      an=getLCA(term1,term2, IC)
+      if(is.na(an))
         return(0)
       else {
-        return(as.double(IC[IC[1]==an][3]))
+        return(IC[IC[,1]==an,3])
       }  
     }
     else if(method == "JiangConrath"){
-      an=getMinimumSubsumer(term1,term2)
-      if(an == "NA"||an=="HP:0000001"||an=="HP:0000004"||an=="HP:0000005"||an=="HP:0000118")
+      an=getLCA(term1,term2, IC)
+      if(is.na(an)||an=="HP:0000001"||an=="HP:0000004"||an=="HP:0000005"||an=="HP:0000118")
         return(0)
       if(term1==term2)
         return(1)  
       else{
-        res= - 1/ (  1 + 2*as.double(IC[IC[1]==an][3]) - as.double(IC[IC[1]==term1][3]) - as.double(IC[IC[1]==term2][3]) )     
+        res= - 1/ ( 1 + 2*IC[IC[,1]==an,3] - IC[IC[,1]==term1,3] - IC[IC[,1]==term2,3] )     
         return(res)
       }
     }
     
     else if(method == "Lin"){
-      an=getMinimumSubsumer(term1,term2)
-      if(an == "NA"||an=="HP:0000001"||an=="HP:0000004"||an=="HP:0000005"||an=="HP:0000118")
+      an=getLCA(term1,term2, IC)
+      if(is.na(an)||an=="HP:0000001"||an=="HP:0000004"||an=="HP:0000005"||an=="HP:0000118")
         return(0)
       else{
-        res = 2*as.double(IC[IC[1]==an][3])/(as.double(IC[IC[1]==term1][3])+as.double(IC[IC[1]==term2][3]))
+        res = 2*IC[IC[,1]==an,3]/(IC[IC[,1]==term1,3]+IC[IC[,1]==term2,3])
         return(ifelse(is.na(res), 1, res)) 
       }  
     }
     
     else if(method == "simIC"){ # Li et al.
-      an = getMinimumSubsumer(term1,term2)
-      if(an == "NA"||an=="HP:0000001"||an=="HP:0000004"||an=="HP:0000005"||an=="HP:0000118")
+      an = getLCA(term1,term2, IC)
+      if(is.na(an)||an=="HP:0000001"||an=="HP:0000004"||an=="HP:0000005"||an=="HP:0000118")
         return(0)
       else{
-        res = 2*as.double(IC[IC[1]==an][3])/(as.double(IC[IC[1]==term1][3])+as.double(IC[IC[1]==term2][3])) * (1 - 1/(1 + as.double(IC[IC[1]==an][3])))
+        res = 2*IC[IC[,1]==an,3]/(IC[IC[,1]==term1,3] + IC[IC[,1]==term2,3]) * (1 - 1/(1 + IC[IC[,1]==an,3]))
         return(ifelse(is.na(res), 1, res))
       }
     }
     else if(method == "relevance"){ # Schlicker et al.
-      an = getMinimumSubsumer(term1,term2)
-      if(an == "NA"||an=="HP:0000001"||an=="HP:0000004"||an=="HP:0000005"||an=="HP:0000118"){
+      an = getLCA(term1,term2, IC)
+      if(is.na(an)||an=="HP:0000001"||an=="HP:0000004"||an=="HP:0000005"||an=="HP:0000118"){
         return(0)}
       
       else{
-        res = (2*as.double(IC[IC[1]==an][3])/(as.double(IC[IC[1]==term1][3])+as.double(IC[IC[1]==term2][3])))*(1 - exp(-as.double(IC[IC[1]==an][3])))
+        res = (2*IC[IC[,1]==an,3]/(IC[IC[,1]==term1,3]+IC[IC[,1]==term2,3]))*(1 - exp(-IC[IC[,1]==an,3]))
         return(ifelse(is.na(res), 1, res))
       }  
     }
     
     else if(method == "GIC") # graph information content
-      return(getGIC(term1, term2))
+      return(getGIC(term1, term2, IC))
     
     else if(method == "Wang"){
       res=getSimWang(term1,term2)
@@ -65,7 +67,7 @@ calcTermSim <-
 
 
 getSimWang<-function(term1,term2){
-  initialize()
+  .initialize()
   
   if(term1 == term2){
     return(1);
@@ -143,12 +145,12 @@ getSimWang<-function(term1,term2){
 
 
 getGIC <-
-  function(term1, term2){
-    initialize()	
+  function(term1, term2, IC){
+    .initialize()	
     if(term1 == term2){
       return(1)
     }
-    IC<-get("termIC", envir=HPOSimEnv)
+    #IC<-get("termIC", envir=HPOSimEnv)
     ancestor<-get("Ancestors",envir=HPOSimEnv)
     an1<-ancestor[names(ancestor) == term1]$HP
     an2<-ancestor[names(ancestor) == term2]$HP
@@ -158,13 +160,13 @@ getGIC <-
     a<-0
     for(i in 1:length(ancommon))
     {
-      a <- a+as.double(IC[IC[1]==ancommon[i]][3])
+      a <- a+IC[IC[,1]==ancommon[i],3]
     }		
     
     b<-0
     for(i in 1:length(anunion))
     {
-      b <- b+as.double(IC[IC[1]==anunion[i]][3])
+      b <- b+IC[IC[,1]==anunion[i],3]
     }		
     
     res=a/b

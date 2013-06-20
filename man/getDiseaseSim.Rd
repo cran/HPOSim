@@ -5,7 +5,9 @@
   Given two diseases, the function calculates similarity of the diseases based on HPO.
 }
 \usage{
-  getDiseaseSim(disease1,disease2,combinemethod="funSimMax",method="Resnik",ontology="PA",normalization=FALSE,normalizationmethod="Lin", verbose=FALSE)
+  getDiseaseSim(disease1,disease2,combinemethod="funSimMax",
+                method="Resnik",ontology="PA",normalization=FALSE,
+                normalizationmethod="Lin", verbose=FALSE)
 }
 \arguments{
   \item{disease1}{ one disease OMIM ID }

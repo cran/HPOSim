@@ -5,7 +5,9 @@
   Given a list of diseases, the function calculates the pairwise similarities for any two diseases in the list using different strategies.
 }
 \usage{
-  getDiseaseListSim(diseaselist,combinemethod="funSimMax",method="Resnik",ontology="PA",normalization=FALSE,normalizationmethod="Lin",verbose=FALSE)
+  getDiseaseListSim(diseaselist,combinemethod="funSimMax",
+                    method="Resnik",ontology="PA",normalization=FALSE,
+                    normalizationmethod="Lin",verbose=FALSE)
 }
 \arguments{
   \item{diseaselist}{ character vector of disease OMIM IDs }

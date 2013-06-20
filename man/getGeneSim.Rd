@@ -5,7 +5,9 @@
   Given two genes, the function calculates similarity of the genes based on HPO.
 }
 \usage{
-  getGeneSim(gene1,gene2,combinemethod="funSimMax",method="Resnik",ontology="PA",normalization=FALSE,normalizationmethod="Lin", verbose=FALSE)
+  getGeneSim(gene1,gene2,combinemethod="funSimMax",method="Resnik",
+             ontology="PA",normalization=FALSE,normalizationmethod="Lin", 
+             verbose=FALSE)
 }
 \arguments{
   \item{gene1}{ one Entrez gene ID }
@@ -41,11 +43,7 @@
 [3] James Z.Wang,Zhidian Du, et al. A new method to measure the semantic similarity of GO terms.Bioinformatics 2007,Vol 23,1274-1281.
 
 }
-\seealso{  
-  \code{\link{getTermListSim}}
-}
 \examples{
   getGeneSim("6708","6710","funSimMax","Lin","PA",FALSE)
-  getGeneSim("2","9",combinemethod="mean",method="Wang","PA",FALSE)
 }
 \keyword{ manip }

@@ -33,9 +33,11 @@
   \code{\link{HPOGeneEnrichment}}
 }
 \examples{
-  edges <- data.frame(node1=c("3930","6223","6223","2317","6223","65018","65109","65055","65055","65125","65266"),
-                      node2=c("6662","2317","6662","545","545","65055","65055","65125","65266","65266","79001"))
-  graph<-graph.data.frame(edges,directed=FALSE)
+  edges <- data.frame(node1=c("3930","6223","6223","2317","6223","65018",
+                              "65109","65055","65055","65125","65266"),
+                      node2=c("6662","2317","6662","545","545","65055",
+                              "65055","65125","65266","65266","79001"))
+  graph<-igraph::graph.data.frame(edges,directed=FALSE)
   write.csv(edges,file="HPOGeneNOAWholeNetEnrichment-testwork.csv",row.names=FALSE) 
   HPOGeneNOAWholeNetEnrichment("HPOGeneNOAWholeNetEnrichment-testwork.csv")
 }

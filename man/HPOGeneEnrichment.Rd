@@ -5,7 +5,8 @@
 	Given a list of genes, the function returns the enriched HPO terms.
 }
 \usage{
-	HPOGeneEnrichment(genelist,filter=5,cutoff=0.05,background=getGeneDefaultBackground())
+	HPOGeneEnrichment(genelist,filter=5,cutoff=0.05,
+                         background=getGeneDefaultBackground())
 }
 
 \arguments{
