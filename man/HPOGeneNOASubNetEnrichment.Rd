@@ -47,6 +47,6 @@
   write.csv(edges,file="HPOGeneNOASubNetEnrichment-backgroundnetwork.csv",row.names=FALSE) 
 
   HPOGeneNOASubNetEnrichment("HPOGeneNOASubNetEnrichment-testnetwork.csv",
-                             "HPOGeneNOASubNetEnrichment-backgroundnetwork.csv",cutoff=0.1)
+                             "HPOGeneNOASubNetEnrichment-backgroundnetwork.csv",cutoff=0.4)
 }
 \keyword{ manip }

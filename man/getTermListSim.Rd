@@ -1,22 +1,19 @@
-\name{getDiseaseSim}
-\alias{getDiseaseSim}
-\title{ Phenotype-based similarity for two diseases base on HPO }
+\name{getTermListSim}
+\alias{getTermListSim}
+\title{ Similarity matrix for two sets of HPO terms }
 \description{
-  Given two diseases, the function calculates similarity of the diseases based on HPO.
+  Given two sets of HPO terms, the function calculates similarity between two sets.
 }
 \usage{
-  getDiseaseSim(disease1,disease2,combinemethod="funSimMax",
-                method="Resnik",ontology="PA",normalization=FALSE,
-                normalizationmethod="Lin", verbose=FALSE)
+  getTermListSim(anno1, anno2, combinemethod="funSimMax",
+                    method="Resnik", IC, verbose=FALSE)
 }
 \arguments{
-  \item{disease1}{ one disease OMIM ID }
-  \item{disease2}{ another disease OMIM ID }
+  \item{anno1}{ one set of HPO terms }
+  \item{anno2}{ another set of HPO terms }
   \item{combinemethod}{ method to calculate the similarity between diseases based on , one of "max", "mean", "funSimMax", "funSimAvg" and ""BMA }
   \item{method}{ method to compute the similarity of HPO terms, one of "Resnik", "JiangConrath", "Lin", "simIC", "relevance", "GIC" and "Wang" }
-  \item{ontology}{ the ontology used to calculate the similarity, one of "PA"(Phenotypic Abnormality), "MI"(Mode of Inheritance) and "OC"(Onset and Clinical Course)}
-  \item{normalization}{ whether do the normalization }
-  \item{normalizationmethod}{ one of "sqrt", "Lin" and "Tanimoto"}
+  \item{IC}{ IC used to calculate similarity between terms }
   \item{verbose}{ print out some information }
 }
 \details{
@@ -30,7 +27,7 @@
   }
 }
 \value{
-  the value of the similarity of two diseases
+  the value of the similarity of two sets of HPO terms
 }
 \author{
   Yue Deng<anfdeng@163.com>
@@ -44,9 +41,13 @@
 
 }
 \seealso{  
-  \code{\link{getDiseaseListSim}}
+  \code{\link{calcTermSim}}
 }
 \examples{
-  getDiseaseSim("OMIM:101900","OMIM:102000")
+  .initialize()
+  IC<-get("termIC",envir=HPOSimEnv)
+  getTermListSim(c("HP:0000118", "HP:0000152", "HP:0000234", "HP:0000271"),
+                 c("HP:0000284", "HP:0000478", "HP:0000479", "HP:0000488"),
+                 combinemethod="funSimMax", method="Resnik", IC=IC, verbose=FALSE)
 }
 \keyword{ manip }

@@ -215,7 +215,7 @@ calculateGeneTermIC<-function(){
       termIC[termIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/MIgenenumber)
     }
   }
-  save(termIC,file="GeneTermIC.rda",compress="bzip2")
+  save(termIC,file="GeneTermIC.rda",compress="xz")
 }
 
 calculateDiseaseTermIC<-function(){
@@ -226,14 +226,20 @@ calculateDiseaseTermIC<-function(){
   termlist<-as.factor(names(term))
   hpo2disease<-get("hpo2disease",envir=HPOSimEnv)
   
-  OCTerms<-unlist(getTermOffsprings("HP:0000004",verbose=FALSE))
-  OCdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000004"),hpo2disease["HP:0000004"]))
-  MITerms<-unlist(getTermOffsprings("HP:0000005",verbose=FALSE))
-  MIdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000005"),hpo2disease["HP:0000005"]))
-  PATerms<-unlist(getTermOffsprings("HP:0000118",verbose=FALSE))
-  PAdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000118"),hpo2disease["HP:0000118"]))
+  OCTerms<-unlist(getTermOffsprings("HP:0000004"))
+  OCdiseasenumber<-length(hpo2disease[["HP:0000004"]])
+  MITerms<-unlist(getTermOffsprings("HP:0000005"))
+  MIdiseasenumber<-length(hpo2disease[["HP:0000005"]])
+  PATerms<-unlist(getTermOffsprings("HP:0000118"))
+  PAdiseasenumber<-length(hpo2disease[["HP:0000118"]])
   
-  termfreq<-lapply(termlist,function(x){length(unique(c(getTermOffspringDiseases(x),hpo2disease[x])))})
+  #OCdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000004"),hpo2disease["HP:0000004"]))
+  #MIdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000005"),hpo2disease["HP:0000005"]))
+  #PAdiseasenumber<-length(c(getTermOffspringDiseases("HP:0000118"),hpo2disease["HP:0000118"]))
+  
+  #termfreq<-lapply(termlist,function(x){length(unique(c(getTermOffspringDiseases(x),hpo2disease[x])))})
+
+  termfreq<-lapply(termlist,function(x){length(hpo2disease[as.character(x)]$"HP")})
   termfrequency<-data.frame(termlist,unlist(termfreq))
   
   ##calculate Disease Term IC
@@ -261,7 +267,7 @@ calculateDiseaseTermIC<-function(){
       DiseasetermIC[DiseasetermIC[1]==xx,][3]<--log(termfrequency[termfrequency[1]==xx,][2]/MIdiseasenumber)
     }
   }
-  save(DiseasetermIC,file="DiseaseTermIC.rda",compress="bzip2")
+  save(DiseasetermIC,file="DiseaseTermIC.rda",compress="xz")
 }
 
 RemoveTermsWithoutIC <- function (terms,ontology,IC){

@@ -1,0 +1,6 @@
+DiseaseTermIC: DiseasetermIC
+DiseaseToPhenotype: disease2hpo
+GeneTermIC: termIC
+GeneToPhenotype: gene2hpo
+PhenotypeToDisease: hpo2disease
+PhenotypeToGene: hpo2gene

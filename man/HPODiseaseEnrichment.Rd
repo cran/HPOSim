@@ -35,8 +35,7 @@
   \code{\link{HPOGeneEnrichment}}
 }
 \examples{
-  diseaselist<-c("OMIM:605685","OMIM:167100","OMIM:304200","OMIM:219300")
+  diseaselist<-c("OMIM:605685","OMIM:167100","OMIM:304200","OMIM:219300",cutoff=0.1)
   res<-HPODiseaseEnrichment(diseaselist)
-  #print(res)
 }
 \keyword{ manip }

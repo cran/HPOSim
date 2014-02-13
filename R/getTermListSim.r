@@ -27,14 +27,22 @@ dp<-function(a,anc,IC){
   return (mean(res))
 }
 
-getAnnotationsSim <- function(anno1, anno2, combinemethod="funSimMax", method="Resnik", IC, verbose=FALSE){	  
-  ##test
-  #     anno1<-c("HP:0000118", "HP:0000152", "HP:0000234", "HP:0000271")
-  #     anno2<-c("HP:0000284", "HP:0000478", "HP:0000479", "HP:0000488")
-  #     combinemethod="funSimMax"
-  #     method="Resnik"
-  #     IC<-get("termIC",envir=HPOSimEnv)
-  #     verbose=FALSE
+getTermListSim <- function(anno1, anno2, combinemethod="funSimMax", method="Resnik", IC, verbose=FALSE){	  
+##test1
+#       anno1<-c("HP:0000118", "HP:0000152", "HP:0000234", "HP:0000271")
+#       anno2<-c("HP:0000284", "HP:0000478", "HP:0000479", "HP:0000488")
+#       combinemethod="funSimMax"
+#       method="Resnik"
+#       IC<-get("termIC",envir=HPOSimEnv)
+#       verbose=FALSE
+  ##test2
+#       anno2<-c("HP:0000118","HP:0000951","HP:0001000","HP:0001574","HP:0200015")
+#       anno1<-c("HP:0000118","HP:0000951","HP:0000962","HP:0001072","HP:0001574","HP:0001597","HP:0001807","HP:0002164") 
+#       combinemethod="funSimMax"
+#       method="Resnik"
+#       IC<-get("DiseasetermIC",envir=HPOSimEnv)
+#       verbose=FALSE
+
   
   if(length(anno1)*length(anno2) == 0) {
     warning(paste("No HPO information for",anno1,anno2,". Similarity set to NaN."))  	
@@ -62,7 +70,7 @@ getAnnotationsSim <- function(anno1, anno2, combinemethod="funSimMax", method="R
       dim(anno1)<-length(anno1); anc1<-unlist(apply(anno1,1,function(x) ancestor[x]$HP)); anc1<-unique(union(anc1,anno1)); anc1<-anc1[!is.na(anc1)];
       dim(anno2)<-length(anno2); anc2<-unlist(apply(anno2,1,function(x) ancestor[x]$HP)); anc2<-unique(union(anc2,anno2)); anc2<-anc2[!is.na(anc2)];
       
-      colMax<-fmax(anno1,anc2,IC)
+      colMax<-fmax(anno1,anc2,IC) 
       rowMax<-fmax(anno2,anc1,IC)
       return (max(colMax,rowMax))
     }
@@ -120,5 +128,5 @@ getAnnotationsSim <- function(anno1, anno2, combinemethod="funSimMax", method="R
     return((sum(apply(ker,1,max))+sum(apply(ker,2,max)))/(m+n))
   }	
   else
-    stop(paste("getAnnotationsSim: Unknown gene combinemethod",combinemethod,"!"))
+    stop(paste("getTermListSim: Unknown gene combinemethod",combinemethod,"!"))
 }

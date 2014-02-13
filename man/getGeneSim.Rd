@@ -12,7 +12,7 @@
 \arguments{
   \item{gene1}{ one Entrez gene ID }
   \item{gene2}{ another Entrez gene ID }
-  \item{combinemethod}{ method to calculate the similarity between genes based on , one of "max", "mean", "funSimMax", "funSimAvg" and ""BMA }
+  \item{combinemethod}{ method to calculate the similarity between genes based on , one of "max", "mean", "funSimMax", "funSimAvg" and "BMA" }
   \item{method}{ method to compute the similarity of HPO terms, one of "Resnik", "JiangConrath", "Lin", "simIC", "relevance" and "Wang" }
   \item{ontology}{ the ontology used to calculate the similarity, one of "PA"(Phenotypic Abnormality), "MI"(Mode of Inheritance) and "OC"(Onset and Clinical Course)}
   \item{normalization}{ whether do the normalization }

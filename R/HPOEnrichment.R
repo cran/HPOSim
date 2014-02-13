@@ -22,10 +22,9 @@ HPOGeneEnrichment <-
     
     #get gene annotated HPOterms
     gene2hpo<-get("gene2hpo",envir=HPOSimEnv)
-    annotatedhpoids<-gene2hpo[genelist[genelist %in% names(gene2hpo)]] 
-    annotatedhpoids<-unique(unlist(annotatedhpoids)) 
+    annotatedhpoids<-unique(unlist(gene2hpo[genelist[genelist %in% names(gene2hpo)]]))
     if(length(annotatedhpoids) == 0){ 
-      stop(paste("No HPOIDS are annotated by",length(genelist),"gene list"))
+      stop(paste("No HPO terms annotate the input gene list"))
     }
     
     hpo2gene<-get("hpo2gene",envir=HPOSimEnv) 
@@ -35,7 +34,7 @@ HPOGeneEnrichment <-
     filteredhpoids<-annotatedhpoids[filteredhpoids] 
     
     if(length(filteredhpoids)==0){ 
-      stop(paste("No HPOIDS annotated by",length(genelist),"gene list match the requirement that have at least",filter,"genes annotated to the HPO term."))
+      stop(paste("No HPO terms meet the requirement that have at least",filter,"genes annotated to the HPO term."))
     }
     
     #######################################
@@ -46,7 +45,6 @@ HPOGeneEnrichment <-
     for(i in 1:length(filteredhpoids)){
       n<-length(hpo2gene[[filteredhpoids[i]]]) 
       m<-length(genelist[genelist %in% hpo2gene[[filteredhpoids[i]]]]) 
-      #p=phyper(m,n,humangenenum-n,searchgenenum,lower.tail=FALSE)
       p=1-phyper(m-1,n,humangenenum-n,searchgenenum) 
       res[[filteredhpoids[i]]]<-list('hpoid'=filteredhpoids[i],'pvalue'=p,'odds'=(m/searchgenenum)/(n/humangenenum),'annGeneNumber'=m,'annBgNumber'=searchgenenum,'geneNumber'=n,'bgNumber'=humangenenum) 
     }
@@ -87,22 +85,23 @@ HPODiseaseEnrichment <-
     ######################################
     .initialize()
     disease2hpo<-get("disease2hpo",envir=HPOSimEnv)
-    annotatedhpoids<-disease2hpo[diseaselist[diseaselist %in% names(disease2hpo)]] 
-    annotatedhpoids<-c(unique(unlist(getTermAncestors(annotatedhpoids))),annotatedhpoids)
-    annotatedhpoids<-unique(na.omit(unlist(annotatedhpoids)))
+    annotatedhpoids<-unique(unlist(disease2hpo[diseaselist[diseaselist %in% names(disease2hpo)]]))
+#     annotatedhpoids<-disease2hpo[diseaselist[diseaselist %in% names(disease2hpo)]] 
+#     annotatedhpoids<-c(unique(unlist(getTermAncestors(annotatedhpoids))),annotatedhpoids)
+#     annotatedhpoids<-unique(na.omit(unlist(annotatedhpoids)))
     if(length(annotatedhpoids) == 0){ 
-      stop(paste("No HPOIDS are annotated by",length(diseaselist),"disease list"))
+      stop(paste("No HPO terms annotate the input disease list."))
     }
     hpo2disease<-get("hpo2disease",envir=HPOSimEnv)
     
     ######################################
     #filter out hpoid which have at least 5 diseaseids annotated to this term
     
-    filteredhpoids<-sapply(annotatedhpoids,function(x){length(c(hpo2disease[x],getTermOffspringDiseases(x)))>=filter}) 
+    filteredhpoids<-sapply(annotatedhpoids,function(x){length(hpo2disease[[x]])>=filter}) 
     filteredhpoids<-annotatedhpoids[filteredhpoids] 
     
     if(length(filteredhpoids)==0){ 
-      stop(paste("No HPOIDS annotated by",length(diseaselist),"disease list match the requirement that have at least",filter,"diseases annotated to the HPO term."))
+      stop(paste("No HPO terms meet the requirement that have at least",filter,"diseases annotated to the HPO term."))
     }
     
     #######################################
@@ -111,9 +110,11 @@ HPODiseaseEnrichment <-
     res<-list()
     searchdiseasenum<-length(diseaselist) 
     for(i in 1:length(filteredhpoids)){
-      n<-length(c(hpo2disease[[filteredhpoids[i]]],getTermOffspringDiseases(filteredhpoids[i]))) 
-      m<-length(diseaselist[diseaselist %in% c(hpo2disease[[filteredhpoids[i]]],getTermOffspringDiseases(filteredhpoids[i]))]) 
-      #p=phyper(m,n,humandiseasenum-n,searchdiseasenum,lower.tail=FALSE)
+      n<-length(hpo2disease[[filteredhpoids[i]]]) 
+      m<-length(diseaselist[diseaselist %in% hpo2disease[[filteredhpoids[i]]]]) 
+#       n<-length(c(hpo2disease[[filteredhpoids[i]]],getTermOffspringDiseases(filteredhpoids[i]))) 
+#       m<-length(diseaselist[diseaselist %in% c(hpo2disease[[filteredhpoids[i]]],getTermOffspringDiseases(filteredhpoids[i]))]) 
+#       #p=phyper(m,n,humandiseasenum-n,searchdiseasenum,lower.tail=FALSE)
       p=1-phyper(m-1,n,humandiseasenum-n,searchdiseasenum) 
       res[[filteredhpoids[i]]]<-list('hpoid'=filteredhpoids[i],'pvalue'=p,'odds'=(m/searchdiseasenum)/(n/humandiseasenum),'annDiseaseNumber'=m,'annBgNumber'=searchdiseasenum,'diseaseNumber'=n,'bgNumber'=humandiseasenum) #对每个HPOID构建一个列表，后面用sapply循环构建数据框
     }
@@ -157,10 +158,10 @@ HPOGeneNOAWholeNetEnrichment <-
     }
     nodelist<-unique(unlist(nodelist))
     if(length(nodelist)<2){ 
-      stop(paste("Nodes not enough."))
+      stop(paste("Not enough nodes."))
     }
     ######################################
-    
+    #give each edges in the complete graph a label
     gene2hpo<-get("gene2hpo",envir=HPOSimEnv)
     edge<-matrix(nrow=length(nodelist),ncol=length(nodelist)) 
     rownames(edge)<-nodelist
@@ -192,7 +193,7 @@ HPOGeneNOAWholeNetEnrichment <-
     }
     annotatedhpoids<-unique(unlist(annotatedhpoids))
     if(length(annotatedhpoids) == 0){ 
-      stop(paste("No HPOIDS are annotated by the input graph"))
+      stop(paste("No HPO terms annotate the input graph"))
     }
     ######################################
     
@@ -210,15 +211,16 @@ HPOGeneNOAWholeNetEnrichment <-
     #filter out hpoid which have at least [filter] edges annotated to this term
     filteredhpoids<-sapply(annotatedhpoids,function(x){length(hpo2edge[[x]])>=filter}) 
     filteredhpoids<-annotatedhpoids[filteredhpoids] 
+    #filteredhpoids<-unique(unlist(filteredhpoids))
     
     if(length(filteredhpoids)==0){ 
-      stop(paste("No HPOID has more than",filter,"edges annotated."))
+      stop(paste("No HP terms annotate more than",filter,"edges."))
     }
     
     #######################################
     res<-list()
-    edgenum<-length(nodelist)*(length(nodelist)-1)/2 
-    searchedgenum<-length(edgelist) #number of edges to be analyzed
+    edgenum<-length(nodelist)*(length(nodelist)-1)/2 #edge number of complete graph
+    searchedgenum<-length(edgelist) #number of edges to be analyzed (actually in the graph)
     for(i in 1:length(filteredhpoids)){
       n<-length(hpo2edge[[filteredhpoids[i]]]) #number of edges annotated to the HPO term
       m<-length(edgelist[edgelist %in% hpo2edge[[filteredhpoids[i]]]]) #number of edges in the edgelist annotated to the HPO term
@@ -267,7 +269,7 @@ HPODiseaseNOAWholeNetEnrichment <-
     }
     nodelist<-unique(unlist(nodelist))
     if(length(nodelist)<2){ 
-      stop(paste("Nodes not enough."))
+      stop(paste("Not enough nodes."))
     }
     ######################################
     
@@ -285,11 +287,12 @@ HPODiseaseNOAWholeNetEnrichment <-
       bound2<-i+1 
       for(j in bound2:length(nodelist))
       {
-        hpo1<-c(disease2hpo[[nodelist[i]]],unique(unlist(getTermAncestors(disease2hpo[[nodelist[i]]]))))
-        #message(paste("disease1:",nodelist[i]," HPO id:",hpo1))
-        hpo2<-c(disease2hpo[[nodelist[j]]],unique(unlist(getTermAncestors(disease2hpo[[nodelist[j]]]))))
-        #message(paste("disease2:",nodelist[j]," HPO id:",hpo2))
-        
+#         hpo1<-c(disease2hpo[[nodelist[i]]],unique(unlist(getTermAncestors(disease2hpo[[nodelist[i]]]))))
+#         #message(paste("disease1:",nodelist[i]," HPO id:",hpo1))
+#         hpo2<-c(disease2hpo[[nodelist[j]]],unique(unlist(getTermAncestors(disease2hpo[[nodelist[j]]]))))
+#         #message(paste("disease2:",nodelist[j]," HPO id:",hpo2))
+        hpo1<-disease2hpo[[nodelist[i]]]
+        hpo2<-disease2hpo[[nodelist[j]]]
         interset<-hpo1[hpo1 %in% hpo2] 
         if(length(interset)>=1) 
         {
@@ -306,7 +309,7 @@ HPODiseaseNOAWholeNetEnrichment <-
     }
     annotatedhpoids<-unique(unlist(annotatedhpoids))
     if(length(annotatedhpoids) == 0){ 
-      stop(paste("No HPOIDS are annotated by the input graph"))
+      stop(paste("No HPO terms annotate the input graph"))
     }
     ######################################
     
@@ -325,7 +328,7 @@ HPODiseaseNOAWholeNetEnrichment <-
     filteredhpoids<-annotatedhpoids[filteredhpoids] 
     
     if(length(filteredhpoids)==0){ 
-      stop(paste("No HPOID has more than",filter,"edges annotated."))
+      stop(paste("No HPO terms annotate more than",filter,"edges."))
     }
     
     #######################################
@@ -383,7 +386,7 @@ HPOGeneNOASubNetEnrichment <-
     }
     nodelist<-unique(unlist(nodelist))
     if(length(nodelist)<2){ 
-      stop(paste("Nodes not enough."))
+      stop(paste("Not enough nodes."))
     }
     ######################################
     
@@ -415,7 +418,7 @@ HPOGeneNOASubNetEnrichment <-
     }
     annotatedhpoids<-unique(unlist(annotatedhpoids))
     if(length(annotatedhpoids) == 0){ 
-      stop(paste("No HPOIDS are annotated by the input graph"))
+      stop(paste("No HPO terms annotate the input graph"))
     }
     ######################################
     
@@ -436,7 +439,7 @@ HPOGeneNOASubNetEnrichment <-
     filteredhpoids<-annotatedhpoids[filteredhpoids] 
     
     if(length(filteredhpoids)==0){ 
-      stop(paste("No HPOID has more than",filter,"edges annotated."))
+      stop(paste("No HPO terms annotate more than",filter,"edges."))
     }
     
     #######################################
@@ -500,7 +503,7 @@ HPODiseaseNOASubNetEnrichment <-
     }
     nodelist<-unique(unlist(nodelist))
     if(length(nodelist)<2){ 
-      stop(paste("Nodes not enough."))
+      stop(paste("Not enough nodes."))
     }
     ######################################
     
@@ -516,8 +519,10 @@ HPODiseaseNOASubNetEnrichment <-
     {
       line<-backgroundnetwork[i,]
       line<-line[line!=""] 
-      hpo1<-c(disease2hpo[[line[1]]],unique(unlist(getTermAncestors(disease2hpo[[line[1]]]))))
-      hpo2<-c(disease2hpo[[line[2]]],unique(unlist(getTermAncestors(disease2hpo[[line[2]]]))))
+      hpo1<-disease2hpo[[line[1]]]
+      hpo2<-disease2hpo[[line[2]]]     
+#       hpo1<-c(disease2hpo[[line[1]]],unique(unlist(getTermAncestors(disease2hpo[[line[1]]]))))
+#       hpo2<-c(disease2hpo[[line[2]]],unique(unlist(getTermAncestors(disease2hpo[[line[2]]]))))
       interset<-hpo1[hpo1 %in% hpo2] 
       if(length(interset)>=1) 
       {
@@ -533,7 +538,7 @@ HPODiseaseNOASubNetEnrichment <-
     }
     annotatedhpoids<-unique(unlist(annotatedhpoids))
     if(length(annotatedhpoids) == 0){ 
-      stop(paste("No HPOIDS are annotated by the input graph"))
+      stop(paste("No HPO terms annotate the input graph"))
     }
     ######################################
     
@@ -554,7 +559,7 @@ HPODiseaseNOASubNetEnrichment <-
     filteredhpoids<-annotatedhpoids[filteredhpoids] 
     
     if(length(filteredhpoids)==0){ 
-      stop(paste("No HPOID has more than",filter,"edges annotated."))
+      stop(paste("No HPO terms annotate more than",filter,"edges."))
     }
     
     #######################################

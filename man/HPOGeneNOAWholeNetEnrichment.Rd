@@ -33,12 +33,13 @@
   \code{\link{HPOGeneEnrichment}}
 }
 \examples{
-  edges <- data.frame(node1=c("3930","6223","6223","2317","6223","65018",
-                              "65109","65055","65055","65125","65266"),
-                      node2=c("6662","2317","6662","545","545","65055",
-                              "65055","65125","65266","65266","79001"))
+ 
+  edges <- data.frame(node1=c("581", "581", "581", "1499", "1499", "1630", 
+                              "60", "257", "999", "1282", "1723", "1760"),
+                      node2=c("1499", "1630", "2033", "1630", "2033", 
+                              "2033", "581", "1499", "2033", "1630", "1760", "581"))
   graph<-igraph::graph.data.frame(edges,directed=FALSE)
   write.csv(edges,file="HPOGeneNOAWholeNetEnrichment-testwork.csv",row.names=FALSE) 
-  HPOGeneNOAWholeNetEnrichment("HPOGeneNOAWholeNetEnrichment-testwork.csv")
+  HPOGeneNOAWholeNetEnrichment("HPOGeneNOAWholeNetEnrichment-testwork.csv",cutoff=0.1)
 }
 \keyword{ manip }

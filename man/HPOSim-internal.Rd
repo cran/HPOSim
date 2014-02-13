@@ -1,13 +1,11 @@
 \name{HPOSim-internal}
 \title{Internal HPOSim objects}
-\alias{SaveGenesToPhenotype}
 \alias{calculateGeneTermIC}
 \alias{getAncestors}
 \alias{getChildren}
 \alias{getGeneDefaultBackground}
 \alias{getDiseaseDefaultBackground}
 \alias{getGIC}
-\alias{getAnnotationsSim}
 \alias{getOffsprings}
 \alias{getParents}
 \alias{getTerms}

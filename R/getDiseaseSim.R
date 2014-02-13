@@ -22,7 +22,7 @@ getDiseaseSim <-
 #     ontology="PA"
 #     normalization=FALSE
 #     normalizationmethod="Lin"
-#     verbose=T
+#     verbose=F
     
     
     if(verbose)
@@ -34,10 +34,10 @@ getDiseaseSim <-
     IC<-get("DiseasetermIC",envir=HPOSimEnv)
     disease2hpo<-get("disease2hpo",envir=HPOSimEnv)
 
-    Terms1<-disease2hpo[disease1]
-    Terms1<-unique(unlist(c(getTermAncestors(Terms1),Terms1)))
-    Terms2<-disease2hpo[disease2]
-    Terms2<-unique(unlist(c(getTermAncestors(Terms2),Terms2)))
+    Terms1<-unlist(disease2hpo[disease1])
+    #Terms1<-unique(unlist(c(getTermAncestors(Terms1),Terms1)))
+    Terms2<-unlist(disease2hpo[disease2])
+    #Terms2<-unique(unlist(c(getTermAncestors(Terms2),Terms2)))
 
     if(length(Terms1)==0) {    
       warning(paste(disease1,"has No effective annotation!"))
@@ -51,16 +51,16 @@ getDiseaseSim <-
     Terms1<-RemoveTermsWithoutIC(Terms1,ontology,IC)
     Terms2<-RemoveTermsWithoutIC(Terms2,ontology,IC)
     
-    if(length(Terms1) >= 1 && length(Terms2)>=1){		
-      Ker<-getAnnotationsSim(Terms1, Terms2, combinemethod, method, IC, verbose)
+    if(length(Terms1) >= 1 && length(Terms2)>=1) {		
+      Ker<-getTermListSim(Terms1, Terms2, combinemethod, method, IC, verbose)
       
       if(normalization){		
-        Ker1<-getAnnotationsSim(Terms1, Terms1, combinemethod, method, IC, verbose)
-        Ker2<-getAnnotationsSim(Terms2, Terms2, combinemethod, method, IC, verbose)
+        Ker1<-getTermListSim(Terms1, Terms1, combinemethod, method, IC, verbose)
+        Ker2<-getTermListSim(Terms2, Terms2, combinemethod, method, IC, verbose)
         Ker = normalize.kernel(Ker,normalizationmethod,Ker1,Ker2)
       }
     }
-    else{
+    else {
       if(length(Terms1) == 0)
         warning(paste(disease1,"has No effective annotation!"))					
       if(length(Terms2) == 0)

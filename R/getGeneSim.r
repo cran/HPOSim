@@ -13,14 +13,14 @@ function(genelist,combinemethod="funSimMax",method="Resnik",ontology="PA",normal
 }
 getGeneSim <-
 function(gene1,gene2, combinemethod="funSimMax", method="Resnik", ontology="PA", normalization=FALSE, normalizationmethod="Lin", verbose=FALSE){
-#   gene1<-"6708"
-#   gene2<-"6710"
+#   gene1<-"410"
+#   gene2<-"650"
 #   combinemethod="funSimMax"
 #   method="Resnik"
 #   ontology="PA"
 #   normalization=FALSE
 #   normalizationmethod="Lin"
-#   verbose=T
+#   verbose=F
   if(verbose)
        message(paste("Calculating Gene Sim: ", gene1, "and", gene2))
   .initialize()
@@ -45,11 +45,11 @@ function(gene1,gene2, combinemethod="funSimMax", method="Resnik", ontology="PA",
   
 
 	if(length(Terms1) >= 1 && length(Terms2)>=1){		
-		Ker<-getAnnotationsSim(Terms1, Terms2, combinemethod, method, IC, verbose)
+		Ker<-getTermListSim(Terms1, Terms2, combinemethod, method, IC, verbose)
 
 		if(normalization){		
-		  Ker1<-getAnnotationsSim(Terms1, Terms1, combinemethod, method, IC, verbose)
-		  Ker2<-getAnnotationsSim(Terms2, Terms2, combinemethod, method, IC, verbose)
+		  Ker1<-getTermListSim(Terms1, Terms1, combinemethod, method, IC, verbose)
+		  Ker2<-getTermListSim(Terms2, Terms2, combinemethod, method, IC, verbose)
 			Ker = normalize.kernel(Ker,normalizationmethod,Ker1,Ker2)
 		}			
 	}
